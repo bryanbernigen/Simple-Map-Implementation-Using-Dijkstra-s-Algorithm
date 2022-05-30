@@ -15,6 +15,8 @@ import javax.swing.*;
 public class GraphDraw extends JFrame {
 	int width;
 	int height;
+	int[] path;
+	int[][] matrix;
 
 	public ArrayList<Node> nodes;
 	public ArrayList<edge> edges;
@@ -76,31 +78,90 @@ public class GraphDraw extends JFrame {
 	}
 
 	public void paint(Graphics g) { // draw the nodes and edges
-		FontMetrics f = g.getFontMetrics();
-		int nodeHeight = Math.max(height, f.getHeight());
+		if (path == null) {
+			FontMetrics f = g.getFontMetrics();
+			int nodeHeight = Math.max(height, f.getHeight());
 
-		for (edge e : edges) {
-			g.setColor(colors[e.i % totalColor]);
-			g.drawString(e.weight, (nodes.get(e.i).x + nodes.get(e.j).x)/2+(e.i>e.j?10:-10), (nodes.get(e.i).y + nodes.get(e.j).y)/2+(e.i>e.j?10:-10));
-			g.drawLine(nodes.get(e.i).x+(e.i>e.j?10:-10), nodes.get(e.i).y+(e.i>e.j?10:-10),
-					nodes.get(e.j).x+(e.i>e.j?10:-10), nodes.get(e.j).y+(e.i>e.j?10:-10));
+			for (edge e : edges) {
+				g.setColor(colors[e.i % totalColor]);
+				g.drawString(e.weight, (nodes.get(e.i).x + nodes.get(e.j).x) / 2 + (e.i > e.j ? 10 : -10),
+						(nodes.get(e.i).y + nodes.get(e.j).y) / 2 + (e.i > e.j ? 10 : -10));
+				g.drawLine(nodes.get(e.i).x + (e.i > e.j ? 10 : -10), nodes.get(e.i).y + (e.i > e.j ? 10 : -10),
+						nodes.get(e.j).x + (e.i > e.j ? 10 : -10), nodes.get(e.j).y + (e.i > e.j ? 10 : -10));
+			}
+
+			colorIndex = 0;
+			for (Node n : nodes) {
+				int nodeWidth = Math.max(width, f.stringWidth(n.name) + width / 2);
+				g.setColor(Color.white);
+				g.fillOval(n.x - nodeWidth / 2, n.y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+				g.setColor(colors[colorIndex % totalColor]);
+				g.drawOval(n.x - nodeWidth / 2, n.y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+
+				g.drawString(n.name, n.x - f.stringWidth(n.name) / 2,
+						n.y + f.getHeight() / 2);
+				colorIndex++;
+			}
+			colorIndex = 0;
+		} else {
+			FontMetrics f = g.getFontMetrics();
+			int nodeHeight = Math.max(height, f.getHeight());
+
+			for (edge e : edges) {
+				g.setColor(Color.black);
+				g.drawString(e.weight, (nodes.get(e.i).x + nodes.get(e.j).x) / 2 + (e.i > e.j ? 10 : -10),
+						(nodes.get(e.i).y + nodes.get(e.j).y) / 2 + (e.i > e.j ? 10 : -10));
+				g.drawLine(nodes.get(e.i).x + (e.i > e.j ? 10 : -10), nodes.get(e.i).y + (e.i > e.j ? 10 : -10),
+						nodes.get(e.j).x + (e.i > e.j ? 10 : -10), nodes.get(e.j).y + (e.i > e.j ? 10 : -10));
+			}
+
+			for (Node n : nodes) {
+				int nodeWidth = Math.max(width, f.stringWidth(n.name) + width / 2);
+				g.setColor(Color.white);
+				g.fillOval(n.x - nodeWidth / 2, n.y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+				g.setColor(Color.black);
+				g.drawOval(n.x - nodeWidth / 2, n.y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+
+				g.drawString(n.name, n.x - f.stringWidth(n.name) / 2,
+						n.y + f.getHeight() / 2);
+			}
+
+			for (int i = 0; i < path.length; i++) {
+
+				int nodeWidth = Math.max(width, f.stringWidth(nodes.get(path[i]).name) + width / 2);
+				g.setColor(Color.white);
+				g.fillOval(nodes.get(path[i]).x - nodeWidth / 2, nodes.get(path[i]).y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+				g.setColor(Color.green);
+				g.drawOval(nodes.get(path[i]).x - nodeWidth / 2, nodes.get(path[i]).y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+
+				g.drawString(nodes.get(path[i]).name, nodes.get(path[i]).x - f.stringWidth(nodes.get(path[i]).name) / 2,
+						nodes.get(path[i]).y + f.getHeight() / 2);
+				if (i + 1 < path.length) {
+					g.drawString(String.valueOf(matrix[path[i]][path[i + 1]]),
+							(nodes.get(path[i]).x + nodes.get(path[i + 1]).x) / 2 + (path[i] > path[i + 1] ? 10 : -10),
+							(nodes.get(path[i]).y + nodes.get(path[i + 1]).y) / 2 + (path[i] > path[i + 1] ? 10 : -10));
+					g.drawLine(nodes.get(path[i]).x + (path[i] > path[i + 1] ? 10 : -10),
+							nodes.get(path[i]).y + (path[i] > path[i + 1] ? 10 : -10),
+							nodes.get(path[i + 1]).x + (path[i] > path[i + 1] ? 10 : -10),
+							nodes.get(path[i + 1]).y + (path[i] > path[i + 1] ? 10 : -10));
+				}
+				nodeWidth = Math.max(width, f.stringWidth(nodes.get(path[i]).name) + width / 2);
+				g.setColor(Color.white);
+				g.fillOval(nodes.get(path[i]).x - nodeWidth / 2, nodes.get(path[i]).y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+				g.setColor(Color.green);
+				g.drawOval(nodes.get(path[i]).x - nodeWidth / 2, nodes.get(path[i]).y - nodeHeight / 2,
+						nodeWidth, nodeHeight);
+				g.drawString(nodes.get(path[i]).name, nodes.get(path[i]).x - f.stringWidth(nodes.get(path[i]).name) / 2,
+						nodes.get(path[i]).y + f.getHeight() / 2);
+			}
 		}
-
-		colorIndex = 0;
-		for (Node n : nodes) {
-			int nodeWidth = Math.max(width, f.stringWidth(n.name) + width / 2);
-			g.setColor(Color.white);
-			g.fillOval(n.x - nodeWidth / 2, n.y - nodeHeight / 2,
-					nodeWidth, nodeHeight);
-			g.setColor(colors[colorIndex % totalColor]);
-			g.drawOval(n.x - nodeWidth / 2, n.y - nodeHeight / 2,
-					nodeWidth, nodeHeight);
-
-			g.drawString(n.name, n.x - f.stringWidth(n.name) / 2,
-					n.y + f.getHeight() / 2);
-			colorIndex++;
-		}
-		colorIndex = 0;
 	}
 }
 

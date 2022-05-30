@@ -10,7 +10,7 @@ public class ReadFile {
       String fullText = "";
       while (myReader.hasNextLine()) {
         String data = myReader.nextLine();
-        fullText += data + "\n";
+        fullText += data + " ";
       }
       myReader.close();
       return fullText;

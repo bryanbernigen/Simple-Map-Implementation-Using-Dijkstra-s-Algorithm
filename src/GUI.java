@@ -3,7 +3,10 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -44,7 +47,6 @@ public class GUI {
         this.window.setSize(width, height);
         this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.window.setTitle("Djikstra's Algorithm");
-        this.window.setResizable(false);
         this.window.setLayout(null);
 
         // Notification Panel
@@ -141,14 +143,22 @@ public class GUI {
                 }
                 frame.repaint();
                 multiPurposeButton.setText("Start");
-                notificationTextArea.setText("<html><center>Click Start After you click 2 buttons</center></html>");
+                notificationTextArea.setText("<html><center>Please Select Your Starting Node</center></html>");
             }
             if (count == 1) {
-                if(buttonHandler.firstNode!=-1 && buttonHandler.secondNode!=-1){
+                if (buttonHandler.firstNode != -1 && buttonHandler.secondNode != -1) {
                     for (JButton jButton : nodes) {
                         jButton.setVisible(false);
                     }
                     CalculateDjikstraAlgorithm(buttonHandler.firstNode, buttonHandler.secondNode);
+                    count++;
+                    multiPurposeButton.setText("Exit");
+                    multiPurposeButton.setActionCommand("Exit");
+                }
+            }
+            if (count > 1) {
+                if (e.getActionCommand().equals("Exit")) {
+                    System.exit(0);
                 }
             }
         }
@@ -165,16 +175,20 @@ public class GUI {
                 nodes.get(secondNode).setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 firstNode = -1;
                 secondNode = -1;
+                notificationTextArea.setText("<html><center>Please Select Your Starting Node</center></html>");
             }
             if (firstNode == -1) {
                 firstNode = (int) e.getActionCommand().charAt(0) - 65;
                 nodes.get(firstNode).setBorder(BorderFactory.createLineBorder(Color.RED));
+                notificationTextArea.setText("<html><center>Please Select Your Destination Node</center></html>");
             } else if (firstNode == (int) e.getActionCommand().charAt(0) - 65) {
                 nodes.get(firstNode).setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 firstNode = -1;
+                notificationTextArea.setText("<html><center>Please Select Your Starting Node</center></html>");
             } else {
                 secondNode = (int) e.getActionCommand().charAt(0) - 65;
                 nodes.get(secondNode).setBorder(BorderFactory.createLineBorder(Color.RED));
+                notificationTextArea.setText("<html><center>Prest Start to Start Calculating Shortest Path</center></html>");
             }
         }
     }
@@ -213,47 +227,74 @@ public class GUI {
                 "<html><center>Nodes and Edges Created<br>Please Click Next To Start Selecting Nodes</center></html>");
     }
 
-    int minDistance(int path[], Boolean processedPath[]) {
-        int min = Integer.MAX_VALUE, min_index = -1;
-        for (int i = 0; i < djikstraAlgorithm.getNodeCount(); i++)
-            if (processedPath[i] == false && path[i] <= min) {
-                min = path[i];
-                min_index = i;
-            }
-        return min_index;
-    }
-
     public void CalculateDjikstraAlgorithm(int src, int dest) {
-        int jumlahVertex = djikstraAlgorithm.getNodeCount();
-        int path[] = new int[jumlahVertex];
-        Boolean processedPath[] = new Boolean[jumlahVertex];
+        Instant start = Instant.now();
+        int jumlahIterasi = 0;
+        int jumlahNode = djikstraAlgorithm.matrix.length;
+        int[] jarakTerpendek = new int[jumlahNode];
+        boolean[] added = new boolean[jumlahNode];
 
-        for (int i = 0; i < jumlahVertex; i++) {
-            path[i] = Integer.MAX_VALUE;
-            processedPath[i] = false;
+        // Inisialisasi Semua Kosong
+        for (int index = 0; index < jumlahNode; index++) {
+            jarakTerpendek[index] = Integer.MAX_VALUE;
+            added[index] = false;
         }
+        jarakTerpendek[src] = 0;
+        int[] parents = new int[jumlahNode];
+        parents[src] = -1;
 
-        path[src] = 0;
-        for (int count = 0; count < jumlahVertex - 1; count++) {
-            int i = minDistance(path, processedPath);
-            processedPath[i] = true;
-            for (int j = 0; j < jumlahVertex; j++) {
-                if (!processedPath[j] && djikstraAlgorithm.matrix[i][j] != 0 && path[i] != Integer.MAX_VALUE &&
-                        path[i] + djikstraAlgorithm.matrix[i][j] < path[j]) {
-                    path[j] = path[i] + djikstraAlgorithm.matrix[i][j];
+        // Algoritma Utama
+        for (int i = 1; i < jumlahNode; i++) {
+            int nearestVertex = -1;
+            int shortestDistance = Integer.MAX_VALUE;
+            for (int index = 0; index < jumlahNode; index++) {
+                jumlahIterasi++;
+                if (!added[index] &&
+                        jarakTerpendek[index] < shortestDistance) {
+                    nearestVertex = index;
+                    shortestDistance = jarakTerpendek[index];
+                }
+            }
+
+            added[nearestVertex] = true;
+            for (int index = 0; index < jumlahNode; index++) {
+                int edgeDistance = djikstraAlgorithm.matrix[nearestVertex][index];
+
+                jumlahIterasi++;
+                if (edgeDistance > 0
+                        && ((shortestDistance + edgeDistance) < jarakTerpendek[index])) {
+                    parents[index] = nearestVertex;
+                    jarakTerpendek[index] = shortestDistance +
+                            edgeDistance;
                 }
             }
         }
-        for (int i = 0; i < path.length; i++) {
-            
-            if(path[i]==Integer.MAX_VALUE){
+        String result = getPath(dest, parents);
+        result = result.substring(1);
+        int[] path = Arrays.stream(result.split(",")).mapToInt(Integer::parseInt).toArray();
+        frame.path = path;
+        frame.matrix = djikstraAlgorithm.matrix;
+        for (int i = 0; i < jarakTerpendek.length; i++) {
+
+            if (jarakTerpendek[i] == Integer.MAX_VALUE) {
                 frame.nodes.get(i).name = "INF";
-            }
-            else{
-                frame.nodes.get(i).name = String.valueOf(path[i]);
+            } else {
+                frame.nodes.get(i).name =frame.nodes.get(i).name + String.valueOf(jarakTerpendek[i]);
             }
         }
         frame.nodes.get(src).name = "SRC";
         frame.repaint();
+        Instant end = Instant.now();
+        notificationTextArea.setText("<html><center>Iteration : " + jumlahIterasi + "<br>Path : " + result
+                + "<br>Cost : "+ jarakTerpendek[dest]+"<br>Duration:" + Duration.between(start, end) + "</center></html>");
+    }
+
+    private String getPath(int currentVertex,
+            int[] parents) {
+        if (currentVertex == -1) {
+            return "";
+        }
+        String result = getPath(parents[currentVertex], parents);
+        return result + "," + currentVertex;
     }
 }

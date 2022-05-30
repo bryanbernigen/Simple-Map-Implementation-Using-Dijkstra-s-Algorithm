@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class DjikstraAlgorithm {
     int matrix[][];     //Matrix Ketetangaan
     int jumlahVertex;   //Jumlah Vertex (node)
@@ -12,17 +14,9 @@ public class DjikstraAlgorithm {
         }
         jumlahVertex = (int) Math.sqrt(jumlahKotak);
         matrix = new int[jumlahVertex][jumlahVertex];
-        int i = 0;
-        int j = 0;
-        int k = 0;
-        for (int l = 0; l < matrixSatuBaris.length(); l++) {
-            if (matrixSatuBaris.charAt(l) == '\n' || matrixSatuBaris.charAt(l) == ' ') {
-                k++;
-                i = k / jumlahVertex;
-                j = k % jumlahVertex;
-            } else {
-                matrix[i][j] = Integer.parseInt(String.valueOf(matrixSatuBaris.charAt(l)));
-            }
+        int[] temp = Arrays.stream(matrixSatuBaris.split(" ")).mapToInt(Integer::parseInt).toArray();
+        for (int l = 0; l < temp.length; l++) {
+            matrix[l / jumlahVertex][l % jumlahVertex] = temp[l];
         }
     }
 
