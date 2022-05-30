@@ -23,6 +23,9 @@ public class GUI {
     JTextField sourceFileInputArea;
     JButton sourceFileEnterButton;
 
+    // Huge Text in The Middle
+    JTextArea textArea;
+
     // Algoritma Djikstra
     JPanel algoritmaDjikstraPanel;
     DjikstraAlgorithm djikstraAlgorithm;
@@ -88,6 +91,13 @@ public class GUI {
         this.sourceFilePanel.add(this.sourceFileInputArea);
         this.sourceFilePanel.setVisible(true); // SEMENTARA DISEMBUNYIIN DULU
 
+        // Huge Text in The Middle
+        this.textArea = new JTextArea();
+        this.textArea.setBounds(Math.floorDiv(width, 8), Math.floorDiv(height, 5),
+                Math.floorDiv(3 * width, 4), Math.floorDiv(7 * height, 10));
+        this.textArea.setFont(new Font("Arial", Font.PLAIN, 20));
+        this.textArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
         // Algoritma Djikstra
         this.frame = new GraphDraw();
         this.frame.setBounds(0, Math.floorDiv(height, 8), width, Math.floorDiv(9 * height, 10));
@@ -126,6 +136,7 @@ public class GUI {
                 createInitialNodes();
                 frame.setVisible(true);
                 sourceFilePanel.setVisible(false);
+                window.add(textArea);
             }
 
         }
@@ -188,7 +199,8 @@ public class GUI {
             } else {
                 secondNode = (int) e.getActionCommand().charAt(0) - 65;
                 nodes.get(secondNode).setBorder(BorderFactory.createLineBorder(Color.RED));
-                notificationTextArea.setText("<html><center>Prest Start to Start Calculating Shortest Path</center></html>");
+                notificationTextArea
+                        .setText("<html><center>Prest Start to Start Calculating Shortest Path</center></html>");
             }
         }
     }
@@ -229,6 +241,7 @@ public class GUI {
 
     public void CalculateDjikstraAlgorithm(int src, int dest) {
         Instant start = Instant.now();
+        String text="";
         int jumlahIterasi = 0;
         int jumlahNode = djikstraAlgorithm.matrix.length;
         int[] jarakTerpendek = new int[jumlahNode];
@@ -268,7 +281,20 @@ public class GUI {
                             edgeDistance;
                 }
             }
+            text += "Iterasi ke-" + i + " : ";
+            System.out.print("Iterasi ke-" + i + " : ");
+            for (int j = 0; j < jumlahNode; j++) {
+                if(jarakTerpendek[j]==Integer.MAX_VALUE){
+                    text += "INF ";
+                    System.out.print("INF ");}
+                else{
+                    text += jarakTerpendek[j] + " ";
+                    System.out.print(jarakTerpendek[j] + " ");
+            }}
+            text += "\n";
+            System.out.println();
         }
+        textArea.setText(text);
         String result = getPath(dest, parents);
         result = result.substring(1);
         int[] path = Arrays.stream(result.split(",")).mapToInt(Integer::parseInt).toArray();
@@ -285,7 +311,7 @@ public class GUI {
         frame.nodes.get(src).name = "SRC";
         frame.repaint();
         Instant end = Instant.now();
-        notificationTextArea.setText("<html><center>Iteration : " + jumlahIterasi + "<br>Path : " + result
+        notificationTextArea.setText("<html><center>Perbandingan : " + jumlahIterasi + "<br>Path : " + result
                 + "<br>Cost : "+ jarakTerpendek[dest]+"<br>Duration:" + Duration.between(start, end) + "</center></html>");
     }
 
