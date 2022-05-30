@@ -22,7 +22,7 @@ public class GraphDraw extends JFrame {
 	public ArrayList<edge> edges;
 
 	Color[] colors = { Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.CYAN, Color.PINK,
-			Color.MAGENTA };
+			Color.MAGENTA, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.GRAY, Color.WHITE, Color.BLACK };
 	int colorIndex = 0;
 	int totalColor = colors.length;
 

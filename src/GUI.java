@@ -311,7 +311,7 @@ public class GUI {
         frame.nodes.get(src).name = "SRC";
         frame.repaint();
         Instant end = Instant.now();
-        notificationTextArea.setText("<html><center>Perbandingan : " + jumlahIterasi + "<br>Path : " + result
+        notificationTextArea.setText("<html><center>"+"Iterasi(Perbandingan) : "+(jarakTerpendek.length-1)+"(" + jumlahIterasi + ")<br>Path : " + result
                 + "<br>Cost : "+ jarakTerpendek[dest]+"<br>Duration:" + Duration.between(start, end) + "</center></html>");
     }
 
