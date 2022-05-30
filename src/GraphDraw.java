@@ -16,10 +16,10 @@ public class GraphDraw extends JFrame {
 	int width;
 	int height;
 
-	ArrayList<Node> nodes;
-	ArrayList<edge> edges;
+	public ArrayList<Node> nodes;
+	public ArrayList<edge> edges;
 
-	Color[] colors = { Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.YELLOW, Color.CYAN, Color.PINK,
+	Color[] colors = { Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.CYAN, Color.PINK,
 			Color.MAGENTA };
 	int colorIndex = 0;
 	int totalColor = colors.length;
@@ -28,8 +28,8 @@ public class GraphDraw extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		nodes = new ArrayList<Node>();
 		edges = new ArrayList<edge>();
-		width = 50;
-		height = 50;
+		width = 80;
+		height = 80;
 	}
 
 	public GraphDraw(String name) { // Construct with label
@@ -37,8 +37,8 @@ public class GraphDraw extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		nodes = new ArrayList<Node>();
 		edges = new ArrayList<edge>();
-		width = 50;
-		height = 50;
+		width = 80;
+		height = 80;
 	}
 
 	class Node {

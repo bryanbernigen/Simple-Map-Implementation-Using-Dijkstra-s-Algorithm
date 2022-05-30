@@ -26,7 +26,7 @@ public class GUI {
     GraphDraw frame;
     List<JButton> nodes = new ArrayList<JButton>();
 
-    //All
+    // All
     JButton multiPurposeButton;
 
     // Command Handler
@@ -92,9 +92,10 @@ public class GUI {
         this.frame.setBackground(Color.WHITE);
         this.frame.setLayout(null);
 
-        //Multi Purpose Button
+        // Multi Purpose Button
         this.multiPurposeButton = new JButton();
-        this.multiPurposeButton.setBounds(Math.floorDiv(19*width, 20), Math.floorDiv(8*height, 10), Math.floorDiv(width, 20), Math.floorDiv(height, 20));
+        this.multiPurposeButton.setBounds(Math.floorDiv(19 * width, 20), Math.floorDiv(8 * height, 10),
+                Math.floorDiv(width, 20), Math.floorDiv(height, 20));
         this.multiPurposeButton.setText("Next");
         this.multiPurposeButton.addActionListener(stateHandler);
 
@@ -129,10 +130,11 @@ public class GUI {
     }
 
     public class StateHandler implements ActionListener {
-        int count=0;
+        int count = 0;
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(count==0){
+            if (count == 0) {
                 count++;
                 for (JButton jButton : nodes) {
                     jButton.setVisible(true);
@@ -141,35 +143,38 @@ public class GUI {
                 multiPurposeButton.setText("Start");
                 notificationTextArea.setText("<html><center>Click Start After you click 2 buttons</center></html>");
             }
-            if(count==1){
-
+            if (count == 1) {
+                if(buttonHandler.firstNode!=-1 && buttonHandler.secondNode!=-1){
+                    for (JButton jButton : nodes) {
+                        jButton.setVisible(false);
+                    }
+                    CalculateDjikstraAlgorithm(buttonHandler.firstNode, buttonHandler.secondNode);
+                }
             }
         }
     }
 
-    public class ButtonHandler implements ActionListener{
-        int firstNode=-1;
-        int  secondNode=-1;
+    public class ButtonHandler implements ActionListener {
+        int firstNode = -1;
+        int secondNode = -1;
+
         @Override
-        public void actionPerformed(ActionEvent e){
-            if(firstNode!=-1 && secondNode!=-1){
+        public void actionPerformed(ActionEvent e) {
+            if (firstNode != -1 && secondNode != -1) {
                 nodes.get(firstNode).setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 nodes.get(secondNode).setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                firstNode=-1;
-                secondNode=-1;
+                firstNode = -1;
+                secondNode = -1;
             }
-            if(firstNode==-1){
-                firstNode = (int)e.getActionCommand().charAt(0) - 65;
+            if (firstNode == -1) {
+                firstNode = (int) e.getActionCommand().charAt(0) - 65;
                 nodes.get(firstNode).setBorder(BorderFactory.createLineBorder(Color.RED));
-            }
-            else if(firstNode == (int)e.getActionCommand().charAt(0) - 65){
+            } else if (firstNode == (int) e.getActionCommand().charAt(0) - 65) {
                 nodes.get(firstNode).setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 firstNode = -1;
-            }
-            else{
-                secondNode = (int)e.getActionCommand().charAt(0) - 65;
+            } else {
+                secondNode = (int) e.getActionCommand().charAt(0) - 65;
                 nodes.get(secondNode).setBorder(BorderFactory.createLineBorder(Color.RED));
-                System.out.println(firstNode+" "+secondNode);
             }
         }
     }
@@ -179,20 +184,20 @@ public class GUI {
         String nodeName = "A";
         Random random = new Random();
         for (int i = 0; i < nodeCount; i++) {
-            int x = random.nextInt(width-100) + 50;
-            int y = random.nextInt(Math.floorDiv(9 * height, 10)-100)+50;
-           
+            int x = random.nextInt(width - 100) + 50;
+            int y = random.nextInt(Math.floorDiv(9 * height, 10) - 100) + 50;
+
             JButton nodeButton = new JButton();
             nodeButton.setText(nodeName);
             nodeButton.setFont(new Font("Arial", Font.PLAIN, 20));
-            nodeButton.setBounds(x-32, y-55, 50, 50);
+            nodeButton.setBounds(x - 32, y - 55, 50, 50);
             nodeButton.setVisible(false);
             nodeButton.addActionListener(buttonHandler);
             nodeButton.setActionCommand(nodeName);
             nodes.add(nodeButton);
-            
+
             frame.add(nodeButton);
-            frame.addNode(nodeName, x,y);
+            frame.addNode(nodeName, x, y);
 
             nodeName = Character.toString((char) (nodeName.charAt(0) + 1));
         }
@@ -204,6 +209,51 @@ public class GUI {
                 }
             }
         }
-        notificationTextArea.setText("<html><center>Nodes and Edges Created<br>Please Click Next To Start Selecting Nodes</center></html>");
+        notificationTextArea.setText(
+                "<html><center>Nodes and Edges Created<br>Please Click Next To Start Selecting Nodes</center></html>");
+    }
+
+    int minDistance(int path[], Boolean processedPath[]) {
+        int min = Integer.MAX_VALUE, min_index = -1;
+        for (int i = 0; i < djikstraAlgorithm.getNodeCount(); i++)
+            if (processedPath[i] == false && path[i] <= min) {
+                min = path[i];
+                min_index = i;
+            }
+        return min_index;
+    }
+
+    public void CalculateDjikstraAlgorithm(int src, int dest) {
+        int jumlahVertex = djikstraAlgorithm.getNodeCount();
+        int path[] = new int[jumlahVertex];
+        Boolean processedPath[] = new Boolean[jumlahVertex];
+
+        for (int i = 0; i < jumlahVertex; i++) {
+            path[i] = Integer.MAX_VALUE;
+            processedPath[i] = false;
+        }
+
+        path[src] = 0;
+        for (int count = 0; count < jumlahVertex - 1; count++) {
+            int i = minDistance(path, processedPath);
+            processedPath[i] = true;
+            for (int j = 0; j < jumlahVertex; j++) {
+                if (!processedPath[j] && djikstraAlgorithm.matrix[i][j] != 0 && path[i] != Integer.MAX_VALUE &&
+                        path[i] + djikstraAlgorithm.matrix[i][j] < path[j]) {
+                    path[j] = path[i] + djikstraAlgorithm.matrix[i][j];
+                }
+            }
+        }
+        for (int i = 0; i < path.length; i++) {
+            
+            if(path[i]==Integer.MAX_VALUE){
+                frame.nodes.get(i).name = "INF";
+            }
+            else{
+                frame.nodes.get(i).name = String.valueOf(path[i]);
+            }
+        }
+        frame.nodes.get(src).name = "SRC";
+        frame.repaint();
     }
 }
