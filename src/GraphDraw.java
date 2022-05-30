@@ -76,8 +76,20 @@ public class GraphDraw extends JFrame {
 		edges.add(new edge(i, j, weight));
 		this.repaint();
 	}
+	
+	public void paintComponent(Graphics g) {
+
+		super.paintComponents(g);
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setStroke(new BasicStroke(3));
+		
+	}
 
 	public void paint(Graphics g) { // draw the nodes and edges
+		super.paintComponents(g);
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setStroke(new BasicStroke(2));
+		g2.setFont(new Font("Arial", Font.PLAIN, 20));
 		if (path == null) {
 			FontMetrics f = g.getFontMetrics();
 			int nodeHeight = Math.max(height, f.getHeight());
