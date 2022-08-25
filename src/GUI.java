@@ -254,6 +254,9 @@ public class GUI {
         }
         jarakTerpendek[src] = 0;
         int[] parents = new int[jumlahNode];
+        for(int i=0;i<jumlahNode;i++){
+            parents[i]=-1;
+        }
         parents[src] = -1;
 
         // Algoritma Utama
@@ -268,7 +271,9 @@ public class GUI {
                     shortestDistance = jarakTerpendek[index];
                 }
             }
-
+            if(nearestVertex==-1){
+                continue;
+            }
             added[nearestVertex] = true;
             for (int index = 0; index < jumlahNode; index++) {
                 int edgeDistance = djikstraAlgorithm.matrix[nearestVertex][index];
